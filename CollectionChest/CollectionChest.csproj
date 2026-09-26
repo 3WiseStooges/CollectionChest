@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <AssemblyName>CollectionChest</AssemblyName>
+    <RootNamespace>CollectionChest</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Version>1.0.0</Version>
+    <DebugType>portable</DebugType>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Product>CollectionChest</Product>
+    <Description>A switch in the chest menu that makes a chest pull in items dropped right next to it.</Description>
+    <!-- assembly_valheim references BCL facades at Unity's versions, which never line up with
+         the netstandard2.1 ref pack. The plugin runs against the game's own BCL, so the
+         unification report is noise. -->
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <!-- BepInEx and HarmonyX come from NuGet so a build does not depend on which
+       r2modman profile happens to exist. Only the game's own assemblies are
+       referenced from disk. Override the game path on the command line, e.g.
+       dotnet build CollectionChest/CollectionChest.csproj -c Release -p:ValheimFolder="D:\Steam\steamapps\common\Valheim" -->
+  <PropertyGroup>
+    <ValheimFolder Condition="'$(ValheimFolder)' == '' AND Exists('X:\SteamLibrary\steamapps\common\Valheim')">X:\SteamLibrary\steamapps\common\Valheim</ValheimFolder>
+    <ValheimFolder Condition="'$(ValheimFolder)' == '' AND Exists('$(ProgramFiles)\Steam\steamapps\common\Valheim')">$(ProgramFiles)\Steam\steamapps\common\Valheim</ValheimFolder>
+    <ValheimFolder Condition="'$(ValheimFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimFolder>
+    <Managed>$(ValheimFolder)\valheim_Data\Managed</Managed>
+  </PropertyGroup>
+
+  <Target Name="VerifyRefs" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(Managed)\assembly_valheim.dll')"
+           Text="Valheim managed assemblies not found at '$(Managed)'. Pass -p:ValheimFolder=&quot;...&quot;." />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" PrivateAssets="all" />
+    <PackageReference Include="HarmonyX" Version="2.10.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Game code lives in assembly_valheim.dll, not Assembly-CSharp.dll. -->
+    <Reference Include="assembly_valheim">
+      <HintPath>$(Managed)\assembly_valheim.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- GetStableHashCode, which names the RPC and the ZDO key, lives here. -->
+    <Reference Include="assembly_utils">
+      <HintPath>$(Managed)\assembly_utils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Localize, stripped from the cloned button so it cannot rewrite the label. -->
+    <Reference Include="assembly_guiutils">
+      <HintPath>$(Managed)\assembly_guiutils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(Managed)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(Managed)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(Managed)\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(Managed)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(Managed)\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(Managed)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyOutputs" AfterTargets="Build">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\..\package" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\..\package" />
+  </Target>
+</Project>

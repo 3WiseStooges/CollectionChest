@@ -1,0 +1,37 @@
+[config]
+schemaVersion = "0.0.1"
+
+[general]
+repository = "https://thunderstore.io"
+
+[package]
+# Must match your Thunderstore team name exactly
+namespace = "LJIndustries"
+name = "CollectionChest"
+versionNumber = "1.0.0"
+description = "A switch in the chest menu makes a chest pull in items dropped right beside it. Put one under a smelter, kiln or windmill and the output stores itself."
+websiteUrl = "https://github.com/3WiseStooges/CollectionChest"
+containsNsfwContent = false
+
+[package.dependencies]
+"denikson-BepInExPack_Valheim" = "5.4.2350"
+
+[build]
+icon = "./icon.png"
+readme = "./README.md"
+outdir = "./build"
+
+[[build.copy]]
+source = "./CHANGELOG.md"
+target = "CHANGELOG.md"
+
+[[build.copy]]
+source = "./package/CollectionChest.dll"
+target = "CollectionChest.dll"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = ["valheim"]
+
+[publish.categories]
+valheim = ["mods", "client-side", "tweaks"]

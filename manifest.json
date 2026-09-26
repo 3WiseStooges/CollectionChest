@@ -1,0 +1,9 @@
+{
+  "name": "CollectionChest",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/3WiseStooges/CollectionChest",
+  "description": "A switch in the chest menu makes a chest pull in items dropped right beside it. Put one under a smelter, kiln or windmill and the output stores itself.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2350"
+  ]
+}

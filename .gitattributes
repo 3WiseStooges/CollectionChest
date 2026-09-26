@@ -1,0 +1,8 @@
+* text=auto
+
+# GitHub Actions runs these through bash; CR would end up inside the heredocs.
+*.yml text eol=lf
+*.sh  text eol=lf
+
+*.dll binary
+*.png binary

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Runs Intake's room and add logic against the game's real Inventory class, outside Unity.
+       Needs the game installed, like the main build, so it is a local check rather than CI.
+       How to run it is in DEVELOPMENT.md. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- Same BCL-facade noise as the plugin build. -->
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ValheimFolder Condition="'$(ValheimFolder)' == '' AND Exists('X:\SteamLibrary\steamapps\common\Valheim')">X:\SteamLibrary\steamapps\common\Valheim</ValheimFolder>
+    <ValheimFolder Condition="'$(ValheimFolder)' == '' AND Exists('$(ProgramFiles)\Steam\steamapps\common\Valheim')">$(ProgramFiles)\Steam\steamapps\common\Valheim</ValheimFolder>
+    <ValheimFolder Condition="'$(ValheimFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimFolder>
+    <Managed>$(ValheimFolder)\valheim_Data\Managed</Managed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The real thing, compiled in: the check exercises the shipped code, not a copy of it. -->
+    <Compile Include="..\..\CollectionChest\Intake.cs" Link="Intake.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copied next to the exe so the runtime can load them. Only the game's and Unity's own
+         assemblies: the Managed folder's mscorlib and System.* would collide with .NET's. -->
+    <Reference Include="assembly_valheim"><HintPath>$(Managed)\assembly_valheim.dll</HintPath></Reference>
+    <Reference Include="assembly_utils"><HintPath>$(Managed)\assembly_utils.dll</HintPath></Reference>
+    <Reference Include="assembly_guiutils"><HintPath>$(Managed)\assembly_guiutils.dll</HintPath></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(Managed)\UnityEngine.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(Managed)\UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(Managed)\UnityEngine.PhysicsModule.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>
